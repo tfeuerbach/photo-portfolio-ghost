@@ -3,12 +3,32 @@ $(function () {
     feed();
 });
 
+// Fisher-Yates shuffle algorithm
+function shuffleArray(array) {
+    for (var i = array.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+    return array;
+}
+
 function feed() {
     'use strict';
 
     var grid = document.querySelector('.post-feed');
     if (!grid) return;
     var masonry;
+
+    // Shuffle posts before Masonry initializes
+    var gridItems = Array.from(grid.querySelectorAll('.grid-item:not(.grid-sizer)'));
+    if (gridItems.length > 1) {
+        shuffleArray(gridItems);
+        gridItems.forEach(function(item) {
+            grid.appendChild(item);
+        });
+    }
 
     imagesLoaded(grid, function () {
         masonry = new Masonry(grid, {
