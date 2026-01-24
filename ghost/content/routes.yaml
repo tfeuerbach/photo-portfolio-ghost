@@ -1,0 +1,15 @@
+# Ghost Custom Routes Configuration
+# https://ghost.org/docs/themes/routing/
+
+routes:
+  /tag/:
+    template: custom-tags
+
+collections:
+  /:
+    permalink: /{slug}/
+    template: index
+
+taxonomies:
+  tag: /tag/{slug}/
+  author: /author/{slug}/

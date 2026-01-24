@@ -18,12 +18,34 @@ server {
     
     # Security headers
     add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
-    add_header X-Frame-Options DENY always;
+    add_header X-Frame-Options SAMEORIGIN always;
     add_header X-Content-Type-Options nosniff always;
     add_header X-XSS-Protection "1; mode=block" always;
     
     # Set maximum client body size for file uploads
     client_max_body_size 100M;
+    
+    # Ghost admin panel - no X-Frame-Options to allow Explore iframe
+    location /ghost/ {
+        # Security headers (excluding X-Frame-Options for admin iframes)
+        add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+        add_header X-Content-Type-Options nosniff always;
+        add_header X-XSS-Protection "1; mode=block" always;
+        
+        # Remove X-Frame-Options from Ghost's response to allow Explore iframe
+        proxy_hide_header X-Frame-Options;
+        
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_pass http://ghost:2368;
+        proxy_redirect off;
+        
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+    }
     
     # Proxy pass configuration for Ghost
     location / {

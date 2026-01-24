@@ -1,0 +1,52 @@
+{{!< default}}
+
+<main class="site-main collections-page">
+
+    <header class="collections-header gh-canvas">
+        <h1 class="collections-title">Collections</h1>
+        <p class="collections-description">Browse photos by collection</p>
+    </header>
+
+    <div class="collections-grid">
+        {{#get "tags" include="count.posts" limit="all"}}
+            {{#foreach tags}}
+                {{#if count.posts}}
+                <article class="collection-card">
+                    <header class="collection-card-header">
+                        <h2 class="collection-card-title">
+                            <a href="{{url}}">{{name}}</a>
+                        </h2>
+                        <span class="collection-card-count">({{count.posts}})</span>
+                    </header>
+                    
+                    {{#if description}}
+                        <p class="collection-card-description">{{description}}</p>
+                    {{/if}}
+
+                    <div class="collection-preview">
+                        {{#get "posts" filter="tag:{{slug}}" limit="4" include="feature_image"}}
+                            {{#foreach posts}}
+                                {{#if feature_image}}
+                                <a class="collection-preview-item" href="{{url}}" aria-label="{{title}}">
+                                    <img 
+                                        src="{{img_url feature_image size="m"}}"
+                                        srcset="{{img_url feature_image size="s"}} 300w,
+                                                {{img_url feature_image size="m"}} 750w"
+                                        sizes="(min-width: 1200px) 100px, (min-width: 850px) 120px, 80px"
+                                        alt="{{title}}"
+                                        loading="lazy"
+                                    >
+                                </a>
+                                {{/if}}
+                            {{/foreach}}
+                        {{/get}}
+                    </div>
+
+                    <a class="collection-card-link" href="{{url}}">View collection →</a>
+                </article>
+                {{/if}}
+            {{/foreach}}
+        {{/get}}
+    </div>
+
+</main>

@@ -1,80 +1,4 @@
-:root {
-    --color-primary: #6b46c1;
-    --color-secondary: #5f6c80;
-    --color-toggle-icon: #1a202c;
-    --color-background: #ffffff;
-    --color-text: #1a202c;
-    --color-heading: #000000;
-    --color-divide: #e2e8f0;
-    --color-muted: #f7fafc;
-    --color-header-bg: #ffffff;
-    --color-header-text: #000000;
-}
-
-.dark-mode {
-    --color-primary: #9f7aea;
-    --color-secondary: #8a9ab0;
-    --color-toggle-icon: #edf2f7;
-    --color-background: #1a202c;
-    --color-text: #edf2f7;
-    --color-heading: #ffffff;
-    --color-divide: #4a5568;
-    --color-muted: #2d3748;
-    --color-header-bg: #1a202c;
-    --color-header-text: #ffffff;
-}
-
-body {
-    background-color: var(--color-background);
-    color: var(--color-text);
-}
-
-/* Headings */
-h1, h2, h3, h4, h5, h6 {
-    color: var(--color-heading);
-}
-
-/* Links - apply specifically in dark mode */
-.dark-mode a {
-    color: var(--color-primary);
-}
-
-.dark-mode a:hover {
-    color: var(--color-primary);
-    opacity: 0.8;
-}
-
-/* Make sure content links are visible */
-.dark-mode .gh-content a,
-.dark-mode p a,
-.dark-mode article a {
-    color: var(--color-primary);
-}
-
-/* Header Styles */
-.gh-head {
-    background-color: var(--color-header-bg);
-    color: var(--color-header-text);
-}
-
-.gh-head-logo,
-.gh-head-menu .nav-item,
-.gh-head-menu .nav-item a,
-.gh-head-actions .gh-head-link,
-.gh-head-actions .gh-head-btn,
-.gh-foot .gh-copyright,
-.gh-foot .gh-foot-menu a,
-.gh-foot .gh-powered-by a {
-    color: var(--color-header-text);
-}
-
-/* Ensure all header elements use the header text color */
-.gh-head *,
-.gh-head a {
-    color: var(--color-header-text);
-}
-
-/* Dark Mode Toggle
+/* Dark Mode Toggle Button
 /* ---------------------------------------------------------- */
 
 .gh-color-mode-toggle {
@@ -88,14 +12,18 @@ h1, h2, h3, h4, h5, h6 {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.3s ease, color 0.3s ease;
     border: none;
     outline: none;
     background: none;
     cursor: pointer;
     padding: 0;
     appearance: none;
-    color: var(--color-header-text);
+    color: #1a202c;
+}
+
+.dark-mode .gh-color-mode-toggle {
+    color: rgb(203, 213, 224);
 }
 
 .gh-color-mode-toggle:hover,
@@ -113,7 +41,7 @@ h1, h2, h3, h4, h5, h6 {
     transform: scale(1);
     transition: all 0.45s ease;
     overflow: hidden;
-    box-shadow: inset 8px -8px 0px 0px var(--color-header-text);
+    box-shadow: inset 8px -8px 0px 0px currentColor;
 }
 
 .gh-color-mode-toggle-icon::before {
@@ -139,26 +67,199 @@ h1, h2, h3, h4, h5, h6 {
     position: absolute;
     top: 50%;
     left: 50%;
-    box-shadow: 0 -23px 0 var(--color-header-text), 0 23px 0 var(--color-header-text), 23px 0 0 var(--color-header-text), -23px 0 0 var(--color-header-text), 15px 15px 0 var(--color-header-text), -15px 15px 0 var(--color-header-text), 15px -15px 0 var(--color-header-text), -15px -15px 0 var(--color-header-text);
+    box-shadow: 0 -23px 0 currentColor, 0 23px 0 currentColor, 23px 0 0 currentColor, -23px 0 0 currentColor, 15px 15px 0 currentColor, -15px 15px 0 currentColor, 15px -15px 0 currentColor, -15px -15px 0 currentColor;
     transform: scale(0);
     transition: all 0.35s ease;
 }
 
-/* Dark Mode styles */
+/* Dark Mode Toggle Icon - Sun state */
 .dark-mode .gh-color-mode-toggle-icon {
-    background-color: var(--color-header-text);
-    border: 4px solid var(--color-header-text);
+    background-color: currentColor;
+    border: 4px solid currentColor;
     transform: scale(0.55);
     overflow: visible;
     box-shadow: none;
 }
 
 .dark-mode .gh-color-mode-toggle-icon::before {
-    border: 2px solid var(--color-header-text);
+    border: 2px solid currentColor;
     transform: translate(14px, -14px);
     opacity: 0;
 }
 
 .dark-mode .gh-color-mode-toggle-icon::after {
     transform: scale(1);
+}
+
+/* Dark Mode Color Overrides
+/* ---------------------------------------------------------- */
+
+.dark-mode {
+    --color-white: #1a1a2e;
+    --color-lighter-gray: #252540;
+    --color-light-gray: #2d2d48;
+    --color-mid-gray: #a0a0b8;
+    --color-dark-gray: #c0c0d0;
+    --color-darker-gray: #e8e8f0;
+    --color-black: #ffffff;
+    --color-primary-text: #e8e8f0;
+    --color-secondary-text: #a0a0b8;
+    --ghost-accent-color: #9f7aea;
+}
+
+/* Body and main background */
+.dark-mode {
+    background-color: #1a1a2e;
+    color: #e8e8f0;
+}
+
+.dark-mode .site {
+    background-color: #1a1a2e;
+}
+
+/* Header */
+.dark-mode .gh-head {
+    background-color: #1a1a2e;
+    color: #e8e8f0;
+}
+
+.dark-mode .gh-head a,
+.dark-mode .gh-head .nav a,
+.dark-mode .gh-head-menu a,
+.dark-mode .gh-head-logo {
+    color: #e8e8f0;
+}
+
+.dark-mode .gh-head-logo span {
+    color: #e8e8f0;
+}
+
+/* Footer */
+.dark-mode .gh-foot {
+    background-color: #1a1a2e;
+    color: #a0a0b8;
+}
+
+.dark-mode .gh-foot a {
+    color: #a0a0b8;
+}
+
+.dark-mode .gh-copyright {
+    color: #a0a0b8;
+}
+
+/* Content area */
+.dark-mode .site-content {
+    background-color: #1a1a2e;
+}
+
+/* Post cards and feed */
+.dark-mode .post-feed {
+    background-color: transparent;
+}
+
+.dark-mode .post-caption {
+    background-color: #252540;
+    color: #e8e8f0;
+}
+
+.dark-mode .post-caption-title {
+    color: #ffffff;
+}
+
+.dark-mode .post-caption-meta {
+    color: #a0a0b8;
+}
+
+.dark-mode .post-lightbox {
+    background-color: #252540;
+    color: #e8e8f0;
+}
+
+/* Article pages */
+.dark-mode .gh-article {
+    background-color: #1a1a2e;
+}
+
+.dark-mode .gh-article-title {
+    color: #ffffff;
+}
+
+.dark-mode .gh-article-excerpt {
+    color: #a0a0b8;
+}
+
+.dark-mode .gh-content {
+    color: #e8e8f0;
+}
+
+.dark-mode .gh-content h1,
+.dark-mode .gh-content h2,
+.dark-mode .gh-content h3,
+.dark-mode .gh-content h4,
+.dark-mode .gh-content h5,
+.dark-mode .gh-content h6 {
+    color: #ffffff;
+}
+
+.dark-mode .gh-content a {
+    color: #9f7aea;
+}
+
+/* Collections page */
+.dark-mode .collections-header {
+    color: #e8e8f0;
+}
+
+.dark-mode .collections-title {
+    color: #ffffff;
+}
+
+.dark-mode .collections-description {
+    color: #a0a0b8;
+}
+
+/* Tag page */
+.dark-mode .tag-header {
+    color: #e8e8f0;
+}
+
+.dark-mode .tag-title {
+    color: #ffffff;
+}
+
+.dark-mode .tag-description,
+.dark-mode .tag-count {
+    color: #a0a0b8;
+}
+
+/* Related posts */
+.dark-mode .related-title {
+    color: #ffffff;
+}
+
+/* Buttons and search */
+.dark-mode .gh-search,
+.dark-mode .gh-icon-btn {
+    color: #e8e8f0;
+}
+
+.dark-mode .gh-burger::before,
+.dark-mode .gh-burger::after {
+    background-color: #e8e8f0;
+}
+
+/* Scrollbar */
+.dark-mode::-webkit-scrollbar {
+    background-color: #1a1a2e;
+}
+
+.dark-mode::-webkit-scrollbar-thumb {
+    background-color: #4a4a6a;
+}
+
+/* Selection */
+.dark-mode ::selection {
+    background-color: #9f7aea;
+    color: #ffffff;
 }

@@ -8,6 +8,7 @@
 @import "blog/post.css";
 @import "blog/article.css";
 @import "blog/related.css";
+@import "blog/collections.css";
 @import "misc/pswp.css";
 @import "misc/dark-mode.css";
 @import "misc/mobile-responsive.css";

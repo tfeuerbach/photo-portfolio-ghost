@@ -1,0 +1,20 @@
+{{!< default}}
+
+<main class="site-main">
+
+    <header class="tag-header gh-canvas">
+        <h1 class="tag-title">{{name}}</h1>
+        {{#if description}}
+            <p class="tag-description">{{description}}</p>
+        {{/if}}
+        <span class="tag-count">{{plural pagination.total empty="No photos" singular="% photo" plural="% photos"}}</span>
+    </header>
+
+    <div class="post-feed gh-feed">
+        <div class="grid-item grid-sizer"></div>
+        {{#foreach posts}}
+            {{> "loop"}}
+        {{/foreach}}
+    </div>
+
+</main>

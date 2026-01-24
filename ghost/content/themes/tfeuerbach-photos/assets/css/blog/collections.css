@@ -1,0 +1,239 @@
+/* Tag Page Header */
+.tag-header {
+    text-align: center;
+    padding: 48px 0 32px;
+}
+
+.tag-title {
+    margin: 0 0 8px;
+    font-size: 3.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.tag-description {
+    margin: 0 0 12px;
+    font-size: 1.6rem;
+    color: var(--color-secondary-text);
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.tag-count {
+    display: inline-block;
+    font-size: 1.4rem;
+    color: var(--color-secondary-text);
+    opacity: 0.8;
+}
+
+/* Collections Index Page */
+.collections-page {
+    padding: 0 var(--gap);
+}
+
+.collections-header {
+    text-align: center;
+    padding: 48px 0 40px;
+    max-width: none;
+    width: 100%;
+}
+
+.collections-title {
+    margin: 0 0 8px;
+    font-size: 3.6rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.collections-description {
+    margin: 0;
+    font-size: 1.6rem;
+    color: var(--color-secondary-text);
+}
+
+/* Collections Grid - Override gh-canvas constraints */
+.collections-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 32px;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 var(--gap) 64px;
+}
+
+/* Remove gh-canvas constraints on collections page */
+.collections-page .collections-grid.gh-canvas {
+    max-width: 1400px;
+    width: 100%;
+    padding-left: var(--gap);
+    padding-right: var(--gap);
+}
+
+/* Collection Card */
+.collection-card {
+    background: var(--color-white);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.collection-card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.08);
+    transform: translateY(-4px);
+}
+
+.collection-card-header {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.collection-card-title {
+    margin: 0;
+    font-size: 2.2rem;
+    font-weight: 600;
+}
+
+.collection-card-title a {
+    color: var(--color-darker-gray);
+    text-decoration: none;
+}
+
+.collection-card-title a:hover {
+    color: var(--ghost-accent-color);
+}
+
+.collection-card-count {
+    font-size: 1.5rem;
+    color: var(--color-secondary-text);
+    font-weight: 400;
+}
+
+.collection-card-description {
+    margin: 0 0 16px;
+    font-size: 1.5rem;
+    color: var(--color-secondary-text);
+    line-height: 1.5;
+}
+
+/* Collection Preview Grid - Larger images */
+.collection-preview {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-grow: 1;
+}
+
+.collection-preview-item {
+    position: relative;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 6px;
+    background: var(--color-light-gray);
+}
+
+.collection-preview-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.collection-preview-item:hover img {
+    transform: scale(1.08);
+}
+
+.collection-card-link {
+    display: inline-block;
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--ghost-accent-color);
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+    margin-top: auto;
+}
+
+.collection-card-link:hover {
+    opacity: 0.7;
+}
+
+/* Dark Mode Support */
+.dark-mode .collection-card {
+    background: var(--color-darker-gray);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.dark-mode .collection-card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.dark-mode .collection-card-title a {
+    color: var(--color-white);
+}
+
+.dark-mode .collection-preview-item {
+    background: var(--color-dark-gray);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 500px) {
+    .collections-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+        padding: 0 16px 48px;
+    }
+
+    .tag-header {
+        padding: 32px 16px 24px;
+    }
+
+    .tag-title {
+        font-size: 2.4rem;
+    }
+
+    .collections-header {
+        padding: 32px 16px 24px;
+    }
+
+    .collections-title {
+        font-size: 2.8rem;
+    }
+
+    .collection-card {
+        padding: 20px;
+    }
+
+    .collection-preview {
+        gap: 6px;
+    }
+
+    .collection-preview-item {
+        border-radius: 4px;
+    }
+}
+
+@media (min-width: 501px) and (max-width: 850px) {
+    .collections-grid {
+        grid-template-columns: 1fr;
+        max-width: 500px;
+    }
+}
+
+@media (min-width: 851px) and (max-width: 1200px) {
+    .collections-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1201px) {
+    .collections-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
