@@ -18,12 +18,20 @@
 
 ## Features
 
-- Self-hosted Ghost CMS with customized [Edge theme](https://ghost.org/themes/edge/)
-- Dark/light mode toggle with persistent user preference **(custom integration)**
+### Infrastructure
+- Self-hosted Ghost CMS with complete Docker setup - one command deployment
 - Automated SSL certificates via Let's Encrypt with automatic renewal
 - Daily automated backups (database + content)
 - Nginx reverse proxy with compression and caching
-- Complete Docker setup - one command deployment
+
+### Theme Customizations
+- **Dark/light mode toggle** with persistent user preference and animated sun/moon icon
+- **Collections page** (`/tag/`) that groups photos by tag with preview grids
+- **Random photo layout** that shuffles photos on each page load for variety
+- **Masonry photo grid** for Pinterest-style responsive layout
+- **Custom mobile experience** with fixed bottom navigation bar
+- **PhotoSwipe lightbox** for full-screen photo viewing
+- **Custom favicon set** for all devices and PWA support
 
 ## Quick Start for Your Own Deployment
 
@@ -143,41 +151,47 @@ docker-compose up -d
 
 ## Theme Customizations
 
-This deployment uses a customized version of the [Edge theme](https://ghost.org/themes/edge/) with the following enhancements:
+This deployment uses a customized version of the [Edge theme](https://ghost.org/themes/edge/) called `tfeuerbach-photos` with enhancements for a photo portfolio experience.
 
-### Current Features
+### Custom Features
 
-- **Dark/Light Mode Toggle**: Custom theme switcher in the header that persists user preference
-  - Properly styled headings, links, and content for both modes
-  - Smooth transitions between themes
-  - CSS variables for easy color customization
+| Feature | Description | Key Files |
+|---------|-------------|-----------|
+| **Dark/Light Mode** | Toggle in header with localStorage persistence | `dark-mode.css`, `dark-mode.js` |
+| **Collections Page** | Browse all tags at `/tag/` with photo previews | `custom-tags.hbs`, `collections.css`, `routes.yaml` |
+| **Random Layout** | Photos shuffle on each page load | `main.js` |
+| **Masonry Grid** | Pinterest-style responsive photo layout | `masonry.css`, `masonry.pkgd.min.js` |
+| **Mobile Layout** | Fixed bottom nav bar, hamburger menu | `mobile-responsive.css`, `mobile-menu.js` |
+| **PhotoSwipe** | Full-screen lightbox for photos | `pswp.hbs`, `pswp.css` |
+| **Custom Favicons** | Complete icon set for all devices | `assets/icons/` |
 
-### Planned Features
-
-- **Photo Collections**: Enhanced organization system for grouping photos by series/collections
-  - Coming soon!
+Theme files live in `ghost/content/themes/tfeuerbach-photos/` and are version controlled.
 
 ### Theme Development
 
-If you want to modify the theme further:
-
 ```bash
 # Navigate to theme directory
-cd ghost/content/themes/edge/
+cd ghost/content/themes/tfeuerbach-photos/
 
-# Install dependencies and start development mode
+# Install dependencies
 yarn install
-yarn run dev
 
-# Or just edit CSS/HBS files and restart Ghost
-docker-compose restart ghost
+# Development mode with live reload
+yarn dev
+
+# Build production assets
+gulp build
+
+# Run theme validation
+yarn test
+
+# Create distributable zip
+yarn zip
 ```
 
-**Custom files**:
-- `assets/css/misc/dark-mode.css` - Dark mode styles and toggle
-- `assets/js/dark-mode.js` - Theme switching logic
+After editing CSS/JS, rebuild with `gulp build`. After editing `.hbs` templates, restart Ghost: `docker-compose restart ghost`.
 
-Theme files are in `ghost/content/themes/` and are tracked in git so you can version control your customizations.
+Theme files are tracked in git so you can version control your customizations.
 
 ### Using a Different Theme
 
