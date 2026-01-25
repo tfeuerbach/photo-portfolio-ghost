@@ -23,7 +23,7 @@ server {
     add_header X-XSS-Protection "1; mode=block" always;
     
     # Set maximum client body size for file uploads
-    client_max_body_size 100M;
+    client_max_body_size 250M;
     
     # Ghost admin panel - no X-Frame-Options to allow Explore iframe
     location /ghost/ {

@@ -1,19 +1,6 @@
 /* Mobile Responsive Styles
 /* ---------------------------------------------------------- */
 
-/* Desktop Layout - Keep normal flow */
-@media (min-width: 769px) {
-    .gh-head-actions {
-        display: flex;
-        align-items: center;
-        gap: 0.8rem;
-    }
-    
-    .gh-color-mode-toggle {
-        margin-right: 0;
-    }
-}
-
 /* Mobile Title - Show shorter version on small screens */
 .gh-head-logo-mobile {
     display: none;
@@ -23,14 +10,19 @@
     display: inline;
 }
 
-@media (max-width: 768px) {
-    .gh-head-logo-full {
-        display: none;
-    }
-    
-    .gh-head-logo-mobile {
-        display: inline;
-    }
+/* Hide burger on desktop */
+.gh-burger {
+    display: none;
+}
+
+/* Hide custom overlay on desktop */
+.mobile-menu-overlay {
+    display: none;
+}
+
+/* Hide bottom nav on desktop */
+.mobile-bottom-nav {
+    display: none;
 }
 
 /* Hide Sign up link in footer */
@@ -42,8 +34,188 @@
     display: none !important;
 }
 
-/* Compact Footer for Mobile */
+/* ---------------------------------------------------------- */
+/* Mobile Styles (768px and below) */
+/* ---------------------------------------------------------- */
+
 @media (max-width: 768px) {
+    /* Shorter logo text */
+    .gh-head-logo-full {
+        display: none;
+    }
+    
+    .gh-head-logo-mobile {
+        display: inline;
+    }
+
+    /* Add padding at bottom of page for fixed nav */
+    body {
+        padding-bottom: 70px;
+    }
+
+    /* Prevent body scroll when menu is open */
+    body.is-head-open {
+        overflow: hidden;
+    }
+
+    /* Header layout - simple centered title */
+    .gh-head {
+        position: relative;
+        z-index: 1000;
+    }
+
+    .gh-head-inner {
+        display: block !important;
+        padding: 12px 16px !important;
+        text-align: center;
+    }
+
+    /* Brand section - centered, no padding needed now */
+    .gh-head-brand {
+        display: block !important;
+        text-align: center !important;
+        padding: 0 !important;
+    }
+
+    .gh-head-brand-wrapper {
+        display: inline-block;
+    }
+
+    .gh-head-logo {
+        font-size: 1.15rem;
+        font-weight: 600;
+    }
+
+    /* Hide elements from header - they move to bottom bar */
+    .gh-head-brand > .gh-search,
+    .gh-head-brand > .gh-burger {
+        display: none !important;
+    }
+
+    .gh-head-actions {
+        display: none !important;
+    }
+
+    .gh-head-members {
+        display: none !important;
+    }
+
+    /* ---------------------------------------- */
+    /* Fixed Bottom Navigation Bar */
+    /* ---------------------------------------- */
+    
+    .mobile-bottom-nav {
+        display: flex !important;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 60px;
+        background-color: var(--color-white, #ffffff);
+        border-top: 1px solid var(--color-light-gray, #e6e6e6);
+        justify-content: center;
+        align-items: center;
+        gap: 40px;
+        z-index: 5000;
+        padding: 0 20px;
+    }
+
+    .mobile-bottom-nav button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        opacity: 0.7;
+        transition: opacity 0.2s ease;
+        color: var(--color-darker-gray, #15171a);
+    }
+
+    .mobile-bottom-nav button:hover,
+    .mobile-bottom-nav button:active {
+        opacity: 1;
+    }
+
+    .mobile-bottom-nav .mobile-burger {
+        position: relative;
+    }
+
+    /* Hamburger icon */
+    .mobile-bottom-nav .mobile-burger::before {
+        content: '';
+        display: block;
+        width: 22px;
+        height: 2px;
+        background-color: currentColor;
+        border-radius: 2px;
+        box-shadow: 0 -7px 0 currentColor, 0 7px 0 currentColor;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* X icon when menu is open */
+    .is-head-open .mobile-bottom-nav .mobile-burger::before {
+        transform: rotate(45deg);
+        box-shadow: none;
+    }
+
+    .is-head-open .mobile-bottom-nav .mobile-burger::after {
+        content: '';
+        position: absolute;
+        width: 22px;
+        height: 2px;
+        background-color: currentColor;
+        border-radius: 2px;
+        transform: rotate(-45deg);
+    }
+
+    /* ---------------------------------------- */
+    /* Ghost's Mobile Menu when Open */
+    /* ---------------------------------------- */
+
+    .is-head-open #gh-head {
+        background-color: var(--color-white, #ffffff) !important;
+    }
+
+    /* Add padding at bottom for the fixed nav bar */
+    .is-head-open .gh-head-inner {
+        padding-bottom: 80px !important;
+    }
+
+    .is-head-open .gh-head-menu {
+        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        padding-top: 20px !important;
+    }
+
+    .is-head-open .gh-head-menu .nav {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 1.2rem !important;
+    }
+
+    .is-head-open .gh-head-menu .nav li {
+        opacity: 1 !important;
+        transform: none !important;
+    }
+
+    .is-head-open .gh-head-menu .nav a {
+        font-size: 1.4rem !important;
+        font-weight: 600 !important;
+        color: var(--color-darker-gray, #15171a) !important;
+        padding: 0.6rem 1.5rem !important;
+    }
+
+    /* Hide the custom overlay */
+    .mobile-menu-overlay {
+        display: none !important;
+    }
+
+    /* Footer mobile */
     .gh-foot {
         padding: 2rem 0 1rem;
     }
@@ -54,126 +226,32 @@
     
     .gh-copyright {
         font-size: 0.9rem;
-        margin: 0;
     }
     
     .gh-foot-menu {
         margin-top: 1rem;
     }
-    
-    .gh-foot-menu a {
-        font-size: 0.9rem;
-    }
 }
 
-/* General mobile header improvements */
+/* ---------------------------------------- */
+/* Dark Mode - Mobile */
+/* ---------------------------------------- */
+
 @media (max-width: 768px) {
-    .gh-head-inner {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        position: relative;
-        padding: 1rem 2rem;
+    .dark-mode .mobile-bottom-nav {
+        background-color: var(--color-white, #1a1a2e);
+        border-top-color: var(--color-dark-gray, #333);
     }
-    
-    .gh-head-brand {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-        display: flex;
-        justify-content: center;
-        align-items: center;
+
+    .dark-mode .mobile-bottom-nav button {
+        color: var(--color-darker-gray, #e8e8f0);
     }
-    
-    .gh-head-brand-wrapper {
-        text-align: center;
+
+    .dark-mode.is-head-open #gh-head {
+        background-color: var(--color-white, #1a1a2e) !important;
     }
-    
-    .gh-head-logo {
-        font-size: 1.4rem;
-        white-space: nowrap;
-    }
-    
-    .gh-head-menu {
-        display: none;
-    }
-    
-    /* Mobile: Split toggle to left, search to right */
-    .gh-head-actions {
-        display: flex !important;
-        justify-content: space-between;
-        align-items: center;
-        position: absolute;
-        left: 1rem;
-        right: 1rem;
-        z-index: 10;
-    }
-    
-    .gh-color-mode-toggle {
-        margin-right: 0;
-        display: flex !important;
-        opacity: 1 !important;
-        visibility: visible !important;
-        width: 40px;
-        height: 40px;
-        background-color: rgba(255, 255, 255, 0.1);
-        border-radius: 8px;
-    }
-    
-    .gh-color-mode-toggle-icon {
-        display: block !important;
-        width: 24px !important;
-        height: 24px !important;
-        position: relative !important;
-        border-radius: 50% !important;
-        border: none !important;
-        background-color: transparent !important;
-        transform: scale(1) !important;
-        transition: all 0.45s ease !important;
-        overflow: hidden !important;
-        box-shadow: inset 8px -8px 0px 0px var(--color-header-text) !important;
-    }
-    
-    .gh-color-mode-toggle-icon::before {
-        content: "" !important;
-        position: absolute !important;
-        right: -9px !important;
-        top: -9px !important;
-        height: 24px !important;
-        width: 24px !important;
-        border: none !important;
-        border-radius: 50% !important;
-        transform: translate(0, 0) !important;
-        opacity: 1 !important;
-        transition: transform 0.45s ease !important;
-    }
-    
-    .gh-color-mode-toggle-icon::after {
-        content: "" !important;
-        width: 8px !important;
-        height: 8px !important;
-        border-radius: 50% !important;
-        margin: -4px 0 0 -4px !important;
-        position: absolute !important;
-        top: 50% !important;
-        left: 50% !important;
-        box-shadow: 0 -23px 0 var(--color-header-text), 0 23px 0 var(--color-header-text), 23px 0 0 var(--color-header-text), -23px 0 0 var(--color-header-text), 15px 15px 0 var(--color-header-text), -15px 15px 0 var(--color-header-text), 15px -15px 0 var(--color-header-text), -15px -15px 0 var(--color-header-text) !important;
-        transform: scale(0) !important;
-        transition: all 0.35s ease !important;
-    }
-    
-    .dark-mode .gh-color-mode-toggle-icon {
-        background-color: var(--color-header-text) !important;
-        border: 4px solid var(--color-header-text) !important;
-    }
-    
-    .dark-mode .gh-color-mode-toggle-icon::before {
-        border: 2px solid var(--color-header-text) !important;
-    }
-    
-    /* Hide the search and burger buttons that are in gh-head-brand on mobile since we have them in actions */
-    .gh-head-brand .gh-search,
-    .gh-head-brand .gh-burger {
-        display: none;
+
+    .dark-mode.is-head-open .gh-head-menu .nav a {
+        color: var(--color-darker-gray, #e8e8f0) !important;
     }
 }
