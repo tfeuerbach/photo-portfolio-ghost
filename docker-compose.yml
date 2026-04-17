@@ -58,10 +58,12 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:2368"]
+      # Ghost's image doesn't include curl/wget, so use node's built-in http client.
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:2368/', r => process.exit(r.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1))"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 60s
 
   # Nginx Reverse Proxy
   nginx:
@@ -84,10 +86,14 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: ["CMD", "nginx", "-t"]
-      interval: 30s
+      # Verify nginx config is valid AND the master process is running AND
+      # port 443 is actually listening (catches cases where nginx died but
+      # the container somehow hasn't exited).
+      test: ["CMD-SHELL", "nginx -t >/dev/null 2>&1 && pgrep nginx >/dev/null && nc -z 127.0.0.1 443"]
+      interval: 1m
       timeout: 10s
       retries: 3
+      start_period: 30s
 
   # Certbot for SSL certificates renewal
   certbot:
@@ -98,8 +104,17 @@ services:
     volumes:
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
+      # Needed so the deploy-hook can signal the nginx container to reload.
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    # Installs docker-cli on first run, then loops: try renew every 12h and
+    # reload nginx (SIGHUP) only when a cert was actually renewed.
     command: >
-      sh -c "trap exit TERM; while :; do certbot renew --quiet; sleep 12h & wait $${!}; done"
+      sh -c "trap exit TERM;
+             apk add --no-cache docker-cli >/dev/null 2>&1 || true;
+             while :; do
+               certbot renew --deploy-hook 'docker kill --signal=HUP photo-portfolio-nginx' --quiet;
+               sleep 12h & wait $${!};
+             done"
     depends_on:
       - nginx
     networks:
