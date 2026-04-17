@@ -38,6 +38,18 @@ else
     echo "Temporary certificates created. Run init-letsencrypt.sh to get real certificates."
 fi
 
+# Safety net: reload nginx once a week so any cert renewed by certbot is
+# picked up even if the certbot deploy-hook ever fails to fire.
+(
+    while :; do
+        sleep 7d
+        if nginx -t >/dev/null 2>&1; then
+            echo "Periodic reload: picking up any renewed certs"
+            nginx -s reload
+        fi
+    done
+) &
+
 # Start Nginx
 exec nginx -g 'daemon off;'
 
