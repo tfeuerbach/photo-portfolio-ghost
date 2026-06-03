@@ -53,6 +53,7 @@ services:
       # Only mount themes (tracked in git) and images (prevent container bloat)
       - ./ghost/content/themes:/var/lib/ghost/content/themes
       - ./ghost/content/images:/var/lib/ghost/content/images
+      - ./ghost/content/routes.yaml:/var/lib/ghost/content/settings/routes.yaml:ro
       # Everything else uses Docker volumes
       - ghost_data:/var/lib/ghost/content/data
     networks:
