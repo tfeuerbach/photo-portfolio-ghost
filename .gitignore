@@ -2,10 +2,12 @@
 .env
 !env.example
 
-# SSL certificates and certbot data
+# SSL certificates and certbot data (legacy)
 ssl/
-certbot/conf/
-certbot/www/
+certbot/
+
+# Cloudflare Tunnel credentials (secret)
+cloudflared/credentials.json
 
 # Logs
 nginx/logs/
@@ -13,6 +15,8 @@ nginx/logs/
 
 # Backups
 backups/
+manual/
+manual.tar.gz
 
 # Database data
 db_data/

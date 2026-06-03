@@ -1,0 +1,7 @@
+tunnel: 5ff5f6b9-be2a-469e-9708-793945eb6a82
+credentials-file: /etc/cloudflared/credentials.json
+
+ingress:
+  - hostname: photos.tfeuerbach.dev
+    service: http://nginx:80
+  - service: http_status:404

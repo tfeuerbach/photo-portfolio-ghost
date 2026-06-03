@@ -4,41 +4,39 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-A containerized Ghost CMS deployment for a photo portfolio website. Uses Ghost with a customized Edge theme, featuring dark/light mode toggle, automated SSL via Let's Encrypt, daily backups, and Nginx reverse proxy. All services run via Docker Compose.
+A containerized Ghost CMS deployment for a photo portfolio website, hosted on a personal homelab. Uses Ghost with a customized Edge theme, featuring dark/light mode toggle, daily backups, Nginx reverse proxy, and Cloudflare Tunnel for secure public access without opening ports. All services run via Docker Compose.
 
 ## Common Commands
 
 ### Docker Management
 ```bash
 # Start all services
-docker-compose up -d
+docker compose up -d
 
 # Stop all services
-docker-compose down
+docker compose down
 
 # View logs for a specific service
-docker-compose logs -f [ghost|db|nginx|certbot|ghost-backup]
+docker compose logs -f [ghost|db|nginx|cloudflared|ghost-backup]
 
 # Restart a specific service
-docker-compose restart [service-name]
+docker compose restart [service-name]
 
 # Rebuild nginx after config changes
-docker-compose build nginx && docker-compose up -d nginx
+docker compose build nginx && docker compose up -d nginx
 
 # Update Ghost to latest version
-docker-compose pull ghost && docker-compose up -d ghost
+docker compose pull ghost && docker compose up -d ghost
 ```
 
-### SSL & Certificate Management
+### Cloudflare Tunnel
 ```bash
-# Initial setup (run once)
-./init-letsencrypt.sh
+# Check tunnel status
+docker compose logs -f cloudflared
 
-# Check certificate status
-docker-compose exec certbot certbot certificates
-
-# Reload nginx after certificate renewal (usually automatic)
-docker-compose exec nginx nginx -s reload
+# Tunnel credentials and config live in ./cloudflared/
+# credentials.json is gitignored (secret)
+# config.yml is tracked and points to http://nginx:80
 ```
 
 ### Backup & Restore
@@ -74,26 +72,32 @@ yarn zip
 
 ### Service Structure
 
-**Services communicate via `app-network` Docker bridge network. Only ports 80/443 are exposed to the host.**
+**Services communicate via `app-network` Docker bridge network. Only port 80 is bound to 127.0.0.1 (localhost only). Public access is exclusively through the Cloudflare Tunnel.**
+
+```
+Internet --> Cloudflare Edge (TLS) --> cloudflared --> nginx:80 --> ghost:2368 --> db:3306 (MySQL 8.0)
+                                                                                    ^
+                                                                              ghost-backup (daily 2AM)
+```
 
 - **ghost**: Ghost CMS (latest) - Node.js application running on port 2368 internally
 - **db**: MySQL 8.0 - Database backend, not exposed externally
-- **nginx**: Custom Alpine-based reverse proxy with SSL termination
-- **certbot**: Automated Let's Encrypt SSL certificate management with 12-hour renewal checks
+- **nginx**: Custom Alpine-based HTTP reverse proxy (no SSL — Cloudflare handles TLS)
+- **cloudflared**: Cloudflare Tunnel client connecting to Cloudflare's edge network
 - **ghost-backup**: Daily backup service (2 AM) using bennetimo/ghost-backup
 
 ### Storage Strategy
 
 **Git-tracked:**
 - Theme files in `ghost/content/themes/tfeuerbach-photos/`
-- Infrastructure: `docker-compose.yml`, nginx configs, scripts
+- Infrastructure: `docker-compose.yml`, nginx configs, `cloudflared/config.yml`
 - Theme customizations, especially `dark-mode.css` and `dark-mode.js`
+- Custom routes in `ghost/content/routes.yaml`
 
 **Host-mounted volumes:**
 - `./ghost/content/themes` - Theme files (tracked)
 - `./ghost/content/images` - User-uploaded photos (not tracked)
-- `./certbot/conf` - SSL certificates (not tracked)
-- `./certbot/www` - ACME challenge files (not tracked)
+- `./cloudflared/` - Tunnel config (tracked) + credentials (not tracked)
 - `./backups` - Backup archives (not tracked)
 
 **Docker volumes:**
@@ -106,11 +110,12 @@ yarn zip
 Environment variables are stored in `.env` (not tracked). See `.env.example` for template.
 
 Required variables:
+- `COMPOSE_PROJECT_NAME` - Must be `photo-portfolio`
 - `MYSQL_ROOT_PASSWORD`, `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_DATABASE`
-- `DOMAIN` - Primary domain for the site
-- `EMAIL` - Email for Let's Encrypt notifications
+- `DOMAIN` - Primary domain for the site (`photos.tfeuerbach.dev`)
 
 Optional:
+- `EMAIL` - Contact email
 - `GMAIL_USER`, `GMAIL_APP_PASSWORD` - For Ghost to send emails
 
 ## Ghost Theme: tfeuerbach-photos
@@ -184,12 +189,12 @@ The dark mode toggle uses CSS variables defined in `:root` and `.dark-mode` clas
 ```bash
 cd ghost/content/themes/tfeuerbach-photos/
 gulp build  # or yarn dev for watch mode
-docker-compose restart ghost
+docker compose restart ghost
 ```
 
 **After editing .hbs templates:**
 ```bash
-docker-compose restart ghost
+docker compose restart ghost
 ```
 
 Ghost caches theme files, so restart is required to see changes.
@@ -197,36 +202,25 @@ Ghost caches theme files, so restart is required to see changes.
 ## Nginx Configuration
 
 Located in `nginx/`:
-- `Dockerfile` - Alpine-based build with OpenSSL
+- `Dockerfile` - Alpine-based build
 - `nginx.conf` - Main nginx configuration
-- `sites-available/default` - Virtual host config (proxies to ghost:2368)
-- `entrypoint.sh` - Startup script for SSL certificate handling
+- `sites-available/default` - HTTP-only virtual host (proxies to ghost:2368)
+- `entrypoint.sh` - Startup script with envsubst for domain templating
 
 The nginx service:
-1. Terminates SSL/TLS (certificates from Let's Encrypt via certbot)
-2. Proxies requests to Ghost container on port 2368
-3. Serves ACME challenge files for certificate validation
-4. Enables compression and caching headers
+1. Proxies requests to Ghost container on port 2368
+2. Sets `X-Forwarded-Proto: https` (Cloudflare terminates TLS)
+3. Enables gzip compression and static asset caching (1 year)
+4. Allows up to 250 MB uploads (`client_max_body_size`)
 
 ## Scripts
-
-### init-letsencrypt.sh
-
-One-time setup script that:
-1. Downloads TLS parameters (dhparam.pem)
-2. Creates temporary self-signed certificates
-3. Starts services
-4. Obtains real Let's Encrypt certificates
-5. Reloads nginx with real certificates
-
-Run after initial deployment or when changing domains.
 
 ### backup.sh
 
 Manual backup script that creates timestamped archives:
 - Ghost content (themes, images, data)
 - MySQL database dump
-- SSL certificates
+- Ghost data volume
 - Configuration files (docker-compose.yml, .env, nginx/)
 
 Saved to `./backups/manual/`.
@@ -246,47 +240,49 @@ Automated backups run daily via the ghost-backup service and are saved to `./bac
 ### Working on Infrastructure
 
 1. Modify docker-compose.yml or nginx configs
-2. Rebuild affected services: `docker-compose build [service]`
-3. Restart: `docker-compose up -d [service]`
-4. Check logs: `docker-compose logs -f [service]`
+2. Rebuild affected services: `docker compose build [service]`
+3. Restart: `docker compose up -d [service]`
+4. Check logs: `docker compose logs -f [service]`
 5. Commit infrastructure changes to git
 
 ### Changing Domain
 
 1. Update `DOMAIN` in `.env`
-2. Remove old certificates: `sudo rm -rf ./certbot/conf/*`
-3. Re-run: `./init-letsencrypt.sh`
-4. Update Ghost URL in admin panel if needed
+2. Update `cloudflared/config.yml` hostname
+3. Run: `~/cloudflared tunnel route dns photo-portfolio new-domain.example.com`
+4. Restart: `docker compose restart cloudflared nginx`
+5. Update Ghost URL in admin panel (Settings > General)
 
 ## Troubleshooting
 
 **Ghost won't start:**
-- Check database connection: `docker-compose logs db ghost`
+- Check database connection: `docker compose logs db ghost`
 - Verify environment variables in `.env`
-- Ensure MySQL is healthy: `docker-compose ps`
+- Ensure MySQL is healthy: `docker compose ps`
 
-**SSL certificate issues:**
-- Verify DNS points to server (A records)
-- Check ports 80/443 are open
-- If using Cloudflare, set SSL mode to "Full" (not "Full (strict)")
-- Reset: `docker-compose down && sudo rm -rf ./certbot/conf/* && ./init-letsencrypt.sh`
+**Site not reachable publicly:**
+- Check tunnel: `docker compose logs cloudflared` (look for "Registered tunnel connection")
+- Verify DNS: `dig photos.tfeuerbach.dev` (should show CNAME to cfargotunnel.com)
+- Check nginx: `docker compose logs nginx`
 
 **Theme not updating:**
-- Restart Ghost: `docker-compose restart ghost`
+- Restart Ghost: `docker compose restart ghost`
 - Rebuild assets: `cd ghost/content/themes/tfeuerbach-photos/ && gulp build`
 - Clear browser cache
 
 **Database issues:**
-- Check MySQL container: `docker-compose logs db`
+- Check MySQL container: `docker compose logs db`
 - Verify credentials in `.env` match `docker-compose.yml`
-- Manual database access: `docker-compose exec db mysql -u${MYSQL_USER} -p${MYSQL_PASSWORD} ${MYSQL_DATABASE}`
+- Manual database access: `docker compose exec db mysql -u${MYSQL_USER} -p${MYSQL_PASSWORD} ${MYSQL_DATABASE}`
 
 ## Important Notes
 
 - **Never commit `.env` file** - contains sensitive credentials
+- **Never commit `cloudflared/credentials.json`** - tunnel secret
 - **Never commit `ghost/content/images/`** - user-uploaded content, can be large
 - **Do commit theme changes** - `ghost/content/themes/tfeuerbach-photos/` is tracked
 - **Backups run automatically** at 2 AM daily, check `./backups/` directory
-- **Certificate renewal is automatic** - certbot checks every 12 hours
-- Ghost admin panel is at `https://yourdomain.com/ghost`
+- **COMPOSE_PROJECT_NAME must stay `photo-portfolio`** - container names depend on it
+- Ghost admin panel is at `https://photos.tfeuerbach.dev/ghost`
 - Theme validation: `cd ghost/content/themes/tfeuerbach-photos/ && yarn test` (runs gscan)
+- Pre-built theme assets are committed -- no build step needed for deployment
