@@ -25,9 +25,16 @@ tar -czf "$BACKUP_DIR/ghost-content-$TIMESTAMP.tar.gz" -C ./ghost content/
 echo "Backing up database..."
 docker-compose exec -T db mysqldump -u${MYSQL_USER} -p${MYSQL_PASSWORD} ${MYSQL_DATABASE} > "$BACKUP_DIR/database-$TIMESTAMP.sql"
 
-# Backup SSL certificates
+# Backup SSL certificates (certbot dirs are root-owned, needs sudo)
 echo "Backing up SSL certificates..."
-tar -czf "$BACKUP_DIR/ssl-certs-$TIMESTAMP.tar.gz" -C ./ssl .
+sudo tar -czf "$BACKUP_DIR/ssl-certs-$TIMESTAMP.tar.gz" -C ./certbot conf/
+
+# Backup Ghost data volume
+echo "Backing up Ghost data volume..."
+docker run --rm \
+  -v photo-portfolio_ghost_data:/data:ro \
+  -v "$(pwd)/$BACKUP_DIR":/backup \
+  alpine tar -czf "/backup/ghost-data-$TIMESTAMP.tar.gz" -C /data .
 
 # Backup configuration files
 echo "Backing up configuration..."
@@ -37,4 +44,5 @@ echo "Backup complete! Files saved to $BACKUP_DIR/"
 echo "Content: ghost-content-$TIMESTAMP.tar.gz"
 echo "Database: database-$TIMESTAMP.sql"
 echo "SSL: ssl-certs-$TIMESTAMP.tar.gz"
+echo "Ghost data: ghost-data-$TIMESTAMP.tar.gz"
 echo "Config: config-$TIMESTAMP.tar.gz"
